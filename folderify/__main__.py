@@ -182,9 +182,11 @@ using the mask image in the cache for that path.")
     FILE_OUT = os.path.join(iconset_folder, "icon_%s.png" % name)
     template_icon = os.path.join(template_folder, "icon_%s.png" % name)
 
-    main_opacity = 15
-    offset_white = 1
+    main_opacity = 13
+    offset_white = 3
     opacity_white = 100
+
+    top_inset_shadow_height = 2 + height/64
 
     # Here comes the magic.
     # TODO: rewrite in Python.
@@ -206,15 +208,17 @@ using the mask image in the cache for that path.")
                 TEMP_MASK_IMAGE, "-negate", "-geometry", "+0-1",
               ")",
               "-compose", "dst-out", "-composite", "+repage", "-negate", "-geometry", ("+0+%d" % offset_white),
+              "-blur", ("0x%d" % (offset_white/2)),
             ")",
             "-compose", "dissolve", "-define", ("compose:args=%dx50" % opacity_white), "-composite", "+repage",
           ")",
           "(",
             TEMP_MASK_IMAGE,
             "(",
-              TEMP_MASK_IMAGE, "-negate", "-geometry", "+0+1",
+              TEMP_MASK_IMAGE, "-negate", "-blur", ("0x%d" % top_inset_shadow_height), "-geometry", ("+0+%d" % top_inset_shadow_height),
             ")",
             "-compose", "dst-out", "-composite", "+repage",
+            "-alpha", "set", "-channel", "A", "-evaluate", "Divide", "3",
           ")",
           "-compose", "dissolve", "-define", "compose:args=50x80", "-composite",
         ")",
